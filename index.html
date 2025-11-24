@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Continual Learning in Large Language Models: Foundations to Frontiers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #0b1120;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: #1f2937;
+      --radius: 16px;
+      --shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827, #020617 55%, #000 100%);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #facc15, #ea580c);
+      box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.15);
+    }
+
+    header.hero {
+      padding: 20px 20px 22px;
+      border-radius: 22px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 65%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.2), transparent 60%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin: 0 0 8px;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 640px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-meta span {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    section {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), #020617);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      padding: 16px 18px 14px;
+      box-shadow: 0 12px 26px rgba(15, 23, 42, 0.7);
+    }
+
+    .section-kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent-2);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 8px;
+      font-size: 0.93rem;
+    }
+
+    ul {
+      margin: 4px 0 8px;
+      padding-left: 20px;
+      font-size: 0.9rem;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+    }
+
+    .outline-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 0;
+    }
+
+    .outline-item {
+      padding: 10px 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .outline-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 2px;
+      font-weight: 500;
+    }
+
+    .outline-time {
+      font-size: 0.78rem;
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .organizers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .organizer-card {
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .organizer-photo {
+  width: 120px;        /* was 54px */
+  height: 120px;       /* was 54px */
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.8);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+    .organizer-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .organizer-info {
+      font-size: 0.86rem;
+    }
+
+    .organizer-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .organizer-aff {
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .ref-list {
+      font-size: 0.86rem;
+      padding-left: 20px;
+      margin: 6px 0 0;
+    }
+
+    .ref-list li {
+      margin-bottom: 4px;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      padding-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    @media (max-width: 640px) {
+      header.hero {
+        padding: 16px;
+      }
+      section {
+        padding: 14px 14px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="hero">
+      <h1 class="hero-title">
+        Continual Learning in Large Language Models: Foundations to Frontiers
+      </h1>
+      <p class="hero-subtitle">
+        A half-day tutorial on continual learning methods for NLP and large language models,
+        covering core CL techniques, NLP-specific setups across tasks and languages,
+        and emerging strategies for continual pretraining, instruction tuning,
+        and alignment in LLMs.
+      </p>
+      <div class="hero-meta">
+        <span>Continual Learning · NLP · LLMs</span>
+        <span>Multilingual & Low-resource Settings</span>
+	<div class="pill">Date & Time: 23 Dec 2025, 14:00 - 17:30 IST</div>
+	
+      </div>
+    </header>
+
+    <main>
+      <!-- Abstract -->
+      <section id="abstract">
+        <div class="section-kicker">Overview</div>
+        <h2 class="section-title">Abstract</h2>
+        <p>
+          Continual learning (CL) equips deep models to learn a sequence of tasks under
+          resource constraints while retaining previously acquired knowledge. This is
+          especially valuable in multilingual and low-resource NLP, where new data and
+          tasks arrive over time and retraining from scratch is impractical.
+        </p>
+        <p>
+          The tutorial introduces major CL methodologies—regularization, replay, and
+          architecture-based approaches—and shows how they support NLP-specific scenarios
+          such as task-incremental, language-incremental, and joint task–language
+          incremental learning. We discuss datasets and evaluation protocols for measuring
+          forgetting and transfer in these settings.
+        </p>
+        <p>
+          A central part of the tutorial is devoted to continual learning for LLMs.
+          We examine how CL ideas apply to large-scale pretraining, continual finetuning
+          and instruction tuning, and evolving alignment objectives, as well as how
+          they relate to practices like model merging and retrieval-augmented generation.
+          The goal is to bridge classical CL and current LLM practice, and to highlight
+          open challenges and opportunities.
+        </p>
+      </section>
+
+      <!-- Key Themes -->
+      <section id="key-themes">
+        <div class="section-kicker">What You Will Learn</div>
+        <h2 class="section-title">Key Themes</h2>
+        <ul>
+          <li>Foundations of continual learning and catastrophic forgetting in deep models.</li>
+          <li>Core CL families: regularization-based, replay-based, and architecture/parameter-isolation methods.</li>
+          <li>NLP continual learning setups: task-incremental, language-incremental, and joint task–language incremental learning.</li>
+          <li>Datasets and metrics for evaluating forgetting, transfer, and stability–plasticity trade-offs in NLP.</li>
+          <li>Continual pretraining for LLMs on evolving corpora (web, code, scientific text) and mixture control.</li>
+          <li>Continual instruction tuning and finetuning: prompts, adapters, and interference-aware merging.</li>
+          <li>Continual alignment as preferences and safety constraints evolve (e.g., RLHF-style updates over time).</li>
+          <li>Connections between CL and LLM practices such as model merging and retrieval-augmented generation.</li>
+          <li>Opportunities for CL in LLM agents and multilingual, low-resource deployment scenarios.</li>
+        </ul>
+      </section>
+
+      <!-- Tutorial Outline -->
+      <section id="outline">
+        <div class="section-kicker">Structure</div>
+        <h2 class="section-title">Tutorial Outline</h2>
+        <p class="muted">
+          Half-day format (~3.5 hours including a 30-minute break), organized into three main blocks.
+        </p>
+        <ul class="outline-list">
+          <li class="outline-item">
+            <div class="outline-header">
+              <span>1. Continual Learning Basics</span>
+              <span class="outline-time">~45 min</span>
+            </div>
+            <p>
+              Motivation, catastrophic forgetting, and core CL scenarios (task-, domain-, and class-incremental).
+              Overview of regularization, replay, and architecture-based methods, including EWC, distillation-based
+              functional regularization, hypernetworks, parameter isolation, dynamic expansion, and replay buffers.
+            </p>
+          </li>
+          <li class="outline-item">
+            <div class="outline-header">
+              <span>2. Continual Learning in NLP</span>
+              <span class="outline-time">~45 min</span>
+            </div>
+            <p>
+              CL for NLP tasks and multilingual setups: task-incremental and language-incremental learning,
+              and joint task–language incremental learning. Discussion of replay-, regularization-, and
+              adapter-based methods, as well as datasets and metrics tailored to NLP.
+            </p>
+          </li>
+          <li class="outline-item">
+            <div class="outline-header">
+              <span>3. Continual Learning in LLMs</span>
+              <span class="outline-time">~90 min</span>
+            </div>
+            <p>
+              CL at the pretraining, finetuning, and alignment stages of large language models:
+              continual pretraining on evolving corpora (e.g., temporal and domain-shifted data),
+              continual instruction tuning (progressive prompts, adapter-based updates, model merging),
+              and continual preference/alignment methods. Connections to
+              retrieval-augmented generation and CL for LLM agents.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Organizers -->
+      <section id="organizers">
+        <div class="section-kicker">Organizers</div>
+        <h2 class="section-title">Tutorial Organizers</h2>
+        <div class="organizers-grid">
+          <div class="organizer-card">
+            <div class="organizer-photo">
+              <img src="srijith_image.jpeg" alt="Photo of P. K. Srijith">
+            </div>
+            <div class="organizer-info">
+              <div class="organizer-name">P. K. Srijith</div>
+              <div class="organizer-aff">
+                Associate Professor, Dept. of CSE &amp; AI, IIT Hyderabad, India
+              </div>
+            </div>
+          </div>
+
+          <div class="organizer-card">
+            <div class="organizer-photo">
+              <img src="shrey_image.jpg" alt="Photo of Shrey Satapara">
+            </div>
+            <div class="organizer-info">
+              <div class="organizer-name">Shrey Satapara</div>
+              <div class="organizer-aff">
+                Researcher-II, AI Lab, Fujitsu Research of India
+              </div>
+            </div>
+          </div>
+
+          <div class="organizer-card">
+            <div class="organizer-photo">
+              <img src="sarath_image.jpeg" alt="Photo of Sarath Chandar">
+            </div>
+            <div class="organizer-info">
+              <div class="organizer-name">Sarath Chandar</div>
+              <div class="organizer-aff">
+                Canada CIFAR AI Chair &amp; Associate Professor, Polytechnique Montréal · Core Faculty, Mila
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- References -->
+      <section id="references">
+        <div class="section-kicker">Reading</div>
+        <h2 class="section-title">Selected References</h2>
+        <ol class="ref-list">
+          <li>
+            French, R. M. (1993).
+            Catastrophic forgetting in connectionist networks: Can it be predicted?
+            <em>Proc. Cognitive Science Society</em>.
+          </li>
+          <li>
+            Liu, B. (2017).
+            Lifelong machine learning: A paradigm for continuous learning.
+            <em>Frontiers of Computer Science</em>.
+          </li>
+          <li>
+            Kirkpatrick, J. et al. (2017).
+            Overcoming catastrophic forgetting in neural networks.
+            <em>PNAS</em>.
+          </li>
+          <li>
+            Wang, L., Zhang, X., Su, H., &amp; Zhu, J. (2024).
+            A comprehensive survey of continual learning: Theory, method and application.
+            <em>IEEE TPAMI</em>.
+          </li>
+          <li>
+            Biesialska, M., Biesialska, K., &amp; Costa-jussà, M. R. (2020).
+            Continual lifelong learning in natural language processing: A survey.
+            <em>COLING</em>.
+          </li>
+          <li>
+            De Lange, M. et al. (2021).
+            A continual learning survey: Defying forgetting in classification tasks.
+            <em>IEEE TPAMI</em>.
+          </li>
+          <li>
+            Satapara, S. &amp; Srijith, P. K. (2024).
+            TL-CL: Task and language incremental continual learning.
+            <em>EMNLP</em>.
+          </li>
+          <li>
+            Wu, T., Luo, L., Li, Y., Pan, S., Vu, T., &amp; Haffari, G. (2024).
+            Continual learning for large language models: A survey.
+            <em>arXiv:2402.01364</em>.
+          </li>
+          <li>
+            Lewis, P. et al. (2020).
+            Retrieval-augmented generation for knowledge-intensive NLP tasks.
+            <em>NeurIPS</em>.
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer>
+      <span>Continual Learning in Large Language Models: Foundations to Frontiers.</span>
+      <span>IJCNLP–AACL Tutorial.</span>
+    </footer>
+  </div>
+</body>
+</html>
